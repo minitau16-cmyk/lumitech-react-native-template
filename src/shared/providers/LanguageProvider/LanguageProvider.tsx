@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { LocalizationService } from '../../services';
-import { useLanguageStore } from '../../stores';
+import { useCurrentLanguage$ } from '../../stores';
 
 export const LanguageProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
-  const languageStore = useLanguageStore();
+  const currentLanguage$ = useCurrentLanguage$();
 
   useEffect(() => {
     const initializeLanguage = () => {
-      const currentLanguage = languageStore.currentLanguage.get();
+      const currentLanguage = currentLanguage$.get();
 
       LocalizationService.changeLanguage(currentLanguage);
     };

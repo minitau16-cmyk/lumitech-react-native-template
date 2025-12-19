@@ -1,8 +1,6 @@
-import { syncObservable } from '@legendapp/state/sync';
 import { observable, syncState } from '@legendapp/state';
-import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { LanguageStore } from './types';
-import { PersistStorageKeys } from '../models';
+import { persistObservable } from '../lib';
 
 const initialState: LanguageStore = {
   currentLanguage: 'en',
@@ -10,12 +8,7 @@ const initialState: LanguageStore = {
 
 export const languageStore$ = observable<LanguageStore>(initialState);
 
-syncObservable(languageStore$, {
-  persist: {
-    name: PersistStorageKeys.LANGUAGE,
-    plugin: ObservablePersistMMKV,
-  },
-});
+persistObservable(languageStore$, 'LANGUAGE_STORAGE');
 
 const languageStoreSyncState$ = syncState(languageStore$);
 

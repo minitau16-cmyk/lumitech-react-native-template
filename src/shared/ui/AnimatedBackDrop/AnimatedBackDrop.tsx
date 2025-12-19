@@ -35,7 +35,7 @@ export const AnimatedBackdrop: React.FC<AnimatedBackdropProps> = React.memo(
 
     return (
       <Animated.View
-        animatedProps={animatedProps}
+        animatedProps={animatedProps as any}
         onTouchStart={onBackdropPress}
         style={[styles.container, animatedStyle]}
       />

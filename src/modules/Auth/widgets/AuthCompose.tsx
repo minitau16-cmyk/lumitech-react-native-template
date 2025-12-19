@@ -4,13 +4,7 @@ import { View, Text } from 'react-native';
 import { Pressable } from 'react-native-gesture-handler';
 import { Show } from '@legendapp/state/react';
 import { StyleSheet } from 'react-native-unistyles';
-import {
-  ActivityIndicator,
-  AnimatedButton,
-  Icon,
-  ReactiveInput,
-  ReactiveSwitch,
-} from 'ui';
+import { ActivityIndicator, AnimatedButton, Icon, ReactiveInput } from 'ui';
 import { useAuth } from '../features';
 import { AuthFooter, AuthLogo, AuthMainInformation, AuthWrapper } from '../ui';
 
@@ -82,12 +76,6 @@ export const AuthCompose: React.FC = () => {
             <View style={styles.inputSpacing}>
               <View style={styles.rowBetween}>
                 <View style={styles.rowAlign}>
-                  <ReactiveSwitch
-                    $value={authFormStore$.formFields.rememberMe}
-                    onChange={() =>
-                      authFormStore$.formFields.rememberMe.toggle()
-                    }
-                  />
                   <Pressable
                     onPress={() => {
                       authFormStore$.formFields.rememberMe.toggle();

@@ -1,6 +1,6 @@
 import type { UseQueryResult } from '@tanstack/react-query';
 import { useLatest } from 'hooks';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type QueryEvents<TData = unknown, TError = unknown> = {
   onSuccess?: (data: TData) => unknown;
@@ -16,15 +16,35 @@ export const useQueryEvents = <TData = unknown, TError = unknown>(
   const onSuccessRef = useLatest(onSuccess);
   const onErrorRef = useLatest(onError);
 
-  useEffect(() => {
-    if (query.isSuccess && onSuccessRef.current && query.data) {
-      onSuccessRef.current(query.data);
-    }
-  }, [query.isSuccess, query.data]);
+  const queryRef = useRef(query);
+
+  queryRef.current = query;
+
+  const wasFetchingRef = useRef(false);
+
+  const wasErrorRef = useRef(false);
 
   useEffect(() => {
-    if (query.isError && onErrorRef.current && query.error) {
-      onErrorRef.current(query.error);
+    const isFetching =
+      queryRef.current.isFetching || queryRef.current.isLoading;
+
+    const justFinishedFetching =
+      wasFetchingRef.current && !isFetching && queryRef.current.isSuccess;
+
+    if (justFinishedFetching && onSuccessRef.current && queryRef.current.data) {
+      onSuccessRef.current(queryRef.current.data);
     }
-  }, [query.isError, query.error]);
+
+    wasFetchingRef.current = isFetching;
+  }, [query.isFetching, query.isLoading]);
+
+  useEffect(() => {
+    const justErrored = !wasErrorRef.current && queryRef.current.isError;
+
+    if (justErrored && onErrorRef.current && queryRef.current.error) {
+      onErrorRef.current(queryRef.current.error);
+    }
+
+    wasErrorRef.current = queryRef.current.isError;
+  }, [query.isError]);
 };

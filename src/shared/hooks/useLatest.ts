@@ -5,7 +5,7 @@ export const useLatest = <Value>(value: Value) => {
 
   useLayoutEffect(() => {
     valueRef.current = value;
-  }, [value]);
+  });
 
   return valueRef;
 };

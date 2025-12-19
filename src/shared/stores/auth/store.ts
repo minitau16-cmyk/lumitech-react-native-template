@@ -1,8 +1,6 @@
-import { syncObservable } from '@legendapp/state/sync';
 import { observable, syncState } from '@legendapp/state';
-import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { AuthStore } from './types';
-import { PersistStorageKeys } from '../models';
+import { persistObservable } from '../lib';
 
 const initialState: AuthStore = {
   refreshToken: '',
@@ -11,12 +9,7 @@ const initialState: AuthStore = {
 
 export const authStore$ = observable<AuthStore>(initialState);
 
-syncObservable(authStore$, {
-  persist: {
-    name: PersistStorageKeys.AUTH,
-    plugin: ObservablePersistMMKV,
-  },
-});
+persistObservable(authStore$, 'AUTH_STORAGE');
 
 const authStoreSyncState$ = syncState(authStore$);
 

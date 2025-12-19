@@ -16,7 +16,7 @@ import { queryClient } from 'api';
 import { breakpoints, DarkTheme, LightTheme } from 'themes';
 import { RootNavigator } from 'navigation';
 import { EventEmitterProvider, LanguageProvider } from 'providers';
-import { themeStore$ } from 'stores';
+import { useCurrentTheme$ } from 'stores';
 import { useDebug } from 'hooks';
 import { modalStack } from './src/modules';
 
@@ -28,7 +28,9 @@ StyleSheet.configure({
   breakpoints,
   settings: {
     initialTheme: () => {
-      return themeStore$.currentTheme.get();
+      const currentTheme$ = useCurrentTheme$();
+
+      return currentTheme$.get();
     },
   },
 });

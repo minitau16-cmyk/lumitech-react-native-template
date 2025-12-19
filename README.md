@@ -1,10 +1,11 @@
 <div align="center">
- <img width="500" src="https://github.com/user-attachments/assets/5083ad51-e604-4e2f-949a-e29a2be4bd73" />
+<img width="500" src="https://github.com/user-attachments/assets/5083ad51-e604-4e2f-949a-e29a2be4bd73" />
+
 </div>
 
 # [Lumitech](https://lumitech.co/) React Native Template 🌌
 
-Welcome to the **Lumitech React Native Template (v0.79.0)**! This template is designed to give you a head start on your project by streamlining the setup process and enabling you to focus on building your app faster. 🌟
+Welcome to the **Lumitech React Native Template (v0.81.5)**! This template is designed to give you a head start on your project by streamlining the setup process and enabling you to focus on building your app faster. 🌟
 
 ### About Lumitech
 
@@ -85,6 +86,17 @@ Enable corepack and prepare Yarn 3 for your project:
 ### Inspired by
 
 - [Feature Sliced Architecture](https://feature-sliced.design/en/)
+
+## 🌍 Environment Parameters
+
+Configure the following environment parameters before starting, including API keys, database connections, and other necessary settings:
+
+```
+API_URL=
+GOOGLE_CLIENT_ID_WEB=
+GOOGLE_CLIENT_ID_IOS=
+DEEP_LINKING_PREFIX=
+```
 
 ## 📁 Project Structure
 

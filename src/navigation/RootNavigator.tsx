@@ -29,7 +29,8 @@ export const RootNavigator: React.FC = () => {
         translucent
       />
 
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        screenOptions={{ headerShown: false, orientation: 'portrait' }}>
         {token ? (
           <Stack.Screen name="MAIN_NAVIGATOR" component={MainNavigator} />
         ) : (
