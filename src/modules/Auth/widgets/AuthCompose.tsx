@@ -11,7 +11,18 @@ import { AuthFooter, AuthLogo, AuthMainInformation, AuthWrapper } from '../ui';
 export const AuthCompose: React.FC = () => {
   const { t } = useTranslation();
 
-  const { onSubmit, isLoading$, authFormStore$ } = useAuth();
+  const {
+    onSubmit,
+    isLoading$,
+    authFormActions,
+    emailField$,
+    passwordField$,
+    isSecureModeEnabled$,
+    emailError$,
+    passwordError$,
+    isEmailError$,
+    isPasswordError$,
+  } = useAuth();
 
   return (
     <View style={styles.container}>
@@ -26,16 +37,9 @@ export const AuthCompose: React.FC = () => {
 
             <View style={styles.emailInputWrapper}>
               <ReactiveInput
-                $value={authFormStore$.formFields.email}
-                $isError={() =>
-                  authFormStore$.didSubmit.get() &&
-                  !!authFormStore$.errors.email.get()
-                }
-                $errorMessage={() =>
-                  authFormStore$.didSubmit.get()
-                    ? authFormStore$.errors.email.get()
-                    : ''
-                }
+                $value={emailField$}
+                $isError={isEmailError$}
+                $errorMessage={emailError$}
                 autoCapitalize="none"
                 autoComplete="off"
                 keyboardType="email-address"
@@ -47,19 +51,12 @@ export const AuthCompose: React.FC = () => {
 
             <View style={styles.inputSpacing}>
               <ReactiveInput
-                $value={authFormStore$.formFields.password}
-                $isError={() =>
-                  authFormStore$.didSubmit.get() &&
-                  !!authFormStore$.errors.password.get()
-                }
-                $errorMessage={() =>
-                  authFormStore$.didSubmit.get()
-                    ? authFormStore$.errors.password.get()
-                    : ''
-                }
-                $secureTextEntry={authFormStore$.isSecureModeEnabled}
+                $value={passwordField$}
+                $isError={isPasswordError$}
+                $errorMessage={passwordError$}
+                $secureTextEntry={isSecureModeEnabled$}
                 $RightIcon={() =>
-                  authFormStore$.isSecureModeEnabled.get() ? (
+                  isSecureModeEnabled$.get() ? (
                     <Icon name="eye-off" size={16} />
                   ) : (
                     <Icon name="eye" size={19} />
@@ -67,7 +64,7 @@ export const AuthCompose: React.FC = () => {
                 }
                 autoCapitalize="none"
                 placeholder={t('placeholders.enter-your-password')}
-                onRightPress={() => authFormStore$.isSecureModeEnabled.toggle()}
+                onRightPress={authFormActions.toggleSecureMode}
                 isRightIconShown
                 disableFullscreenUI
               />
@@ -76,10 +73,7 @@ export const AuthCompose: React.FC = () => {
             <View style={styles.inputSpacing}>
               <View style={styles.rowBetween}>
                 <View style={styles.rowAlign}>
-                  <Pressable
-                    onPress={() => {
-                      authFormStore$.formFields.rememberMe.toggle();
-                    }}>
+                  <Pressable onPress={authFormActions.toggleRememberMe}>
                     <Text style={styles.switchLabel}>
                       {t('buttons.remember-me')}
                     </Text>

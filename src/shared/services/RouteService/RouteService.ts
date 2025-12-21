@@ -2,110 +2,122 @@ import {
   CommonActions,
   createNavigationContainerRef,
   DrawerActions,
+  NavigationContainerRefWithCurrent,
   StackActions,
 } from '@react-navigation/native';
+import { Injectable } from '../lib';
 import { RootStackParamList, RouteType } from './models';
 
-const navigationRef = createNavigationContainerRef<RootStackParamList>();
+export interface RouteService {
+  readonly navigationRef: NavigationContainerRefWithCurrent<RootStackParamList>;
+  navigate<T extends RouteType>(name: T, params?: RootStackParamList[T]): void;
+  goBack(): void;
+  pop(screenCount?: number): void;
+  popToTop(): void;
+  push<T extends RouteType>(name: T, params?: RootStackParamList[T]): void;
+  reset<T extends RouteType>(name: T, params?: RootStackParamList[T]): void;
+  replace<T extends RouteType>(name: T, params?: RootStackParamList[T]): void;
+  openDrawer(): void;
+  closeDrawer(): void;
+  setParams(params: object): void;
+  navigateToNestedNavigatorScreen<N extends RouteType, S extends RouteType>(
+    navigator: N,
+    screen: S,
+    params?: RootStackParamList[S],
+  ): void;
+}
 
-const navigate = <T extends RouteType>(
-  name: T,
-  params?: RootStackParamList[T],
-) => {
-  if (navigationRef?.current) {
-    navigationRef.current?.dispatch(CommonActions.navigate({ name, params }));
+@Injectable()
+export class RouteServiceImpl implements RouteService {
+  readonly navigationRef: NavigationContainerRefWithCurrent<RootStackParamList>;
+
+  constructor() {
+    this.navigationRef = createNavigationContainerRef<RootStackParamList>();
   }
-};
 
-const openDrawer = () => {
-  if (navigationRef?.current) {
-    navigationRef.current?.dispatch(DrawerActions.openDrawer());
+  navigate<T extends RouteType>(name: T, params?: RootStackParamList[T]): void {
+    if (this.navigationRef?.current) {
+      this.navigationRef.current?.dispatch(
+        CommonActions.navigate({ name, params }),
+      );
+    }
   }
-};
 
-const closeDrawer = () => {
-  if (navigationRef?.current) {
-    navigationRef.current?.dispatch(DrawerActions.closeDrawer());
+  openDrawer(): void {
+    if (this.navigationRef?.current) {
+      this.navigationRef.current?.dispatch(DrawerActions.openDrawer());
+    }
   }
-};
 
-const goBack = () => {
-  if (navigationRef?.current && navigationRef.current?.canGoBack()) {
-    navigationRef.current?.dispatch(CommonActions.goBack());
+  closeDrawer(): void {
+    if (this.navigationRef?.current) {
+      this.navigationRef.current?.dispatch(DrawerActions.closeDrawer());
+    }
   }
-};
 
-const pop = (screenCount?: number) => {
-  if (navigationRef?.current && navigationRef.current?.canGoBack()) {
-    navigationRef.current?.dispatch(StackActions.pop(screenCount));
+  goBack(): void {
+    if (
+      this.navigationRef?.current &&
+      this.navigationRef.current?.canGoBack()
+    ) {
+      this.navigationRef.current?.dispatch(CommonActions.goBack());
+    }
   }
-};
 
-const popToTop = () => {
-  if (navigationRef?.current && navigationRef.current?.canGoBack()) {
-    navigationRef.current?.dispatch(StackActions.popToTop());
+  pop(screenCount?: number): void {
+    if (
+      this.navigationRef?.current &&
+      this.navigationRef.current?.canGoBack()
+    ) {
+      this.navigationRef.current?.dispatch(StackActions.pop(screenCount));
+    }
   }
-};
 
-const push = <T extends RouteType>(name: T, params?: RootStackParamList[T]) => {
-  if (navigationRef?.current) {
-    navigationRef.current?.dispatch(StackActions.push(name, params));
+  popToTop(): void {
+    if (
+      this.navigationRef?.current &&
+      this.navigationRef.current?.canGoBack()
+    ) {
+      this.navigationRef.current?.dispatch(StackActions.popToTop());
+    }
   }
-};
 
-const setParams = (params: object) => {
-  navigationRef.current?.dispatch(CommonActions.setParams(params));
-};
-
-const replace = <T extends RouteType>(
-  name: T,
-  params?: RootStackParamList[T],
-) => {
-  if (navigationRef?.current) {
-    navigationRef.current?.dispatch(StackActions.replace(name, params));
+  push<T extends RouteType>(name: T, params?: RootStackParamList[T]): void {
+    if (this.navigationRef?.current) {
+      this.navigationRef.current?.dispatch(StackActions.push(name, params));
+    }
   }
-};
 
-const reset = <T extends RouteType>(
-  name: T,
-  params?: RootStackParamList[T],
-) => {
-  if (navigationRef?.current) {
-    navigationRef.current.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name, params }],
-      }),
-    );
+  setParams(params: object): void {
+    this.navigationRef.current?.dispatch(CommonActions.setParams(params));
   }
-};
 
-const navigateToNestedNavigatorScreen = <
-  N extends RouteType,
-  S extends RouteType,
->(
-  navigator: N,
-  screen: S,
-  params?: RootStackParamList[S],
-) => {
-  if (navigationRef?.current) {
-    navigationRef.current?.dispatch(
-      CommonActions.navigate(navigator, { screen, params }),
-    );
+  replace<T extends RouteType>(name: T, params?: RootStackParamList[T]): void {
+    if (this.navigationRef?.current) {
+      this.navigationRef.current?.dispatch(StackActions.replace(name, params));
+    }
   }
-};
 
-export const RouteService = {
-  navigationRef,
-  navigate,
-  goBack,
-  pop,
-  popToTop,
-  push,
-  reset,
-  replace,
-  openDrawer,
-  closeDrawer,
-  setParams,
-  navigateToNestedNavigatorScreen,
-};
+  reset<T extends RouteType>(name: T, params?: RootStackParamList[T]): void {
+    if (this.navigationRef?.current) {
+      this.navigationRef.current.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name, params }],
+        }),
+      );
+    }
+  }
+
+  navigateToNestedNavigatorScreen<N extends RouteType, S extends RouteType>(
+    navigator: N,
+    screen: S,
+    params?: RootStackParamList[S],
+  ): void {
+    if (this.navigationRef?.current) {
+      this.navigationRef.current?.dispatch(
+        CommonActions.navigate(navigator, { screen, params }),
+      );
+    }
+  }
+}

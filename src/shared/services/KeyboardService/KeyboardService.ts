@@ -1,10 +1,18 @@
 import { KeyboardController } from 'react-native-keyboard-controller';
+import { Injectable } from '../lib';
 
-const dismiss = () => KeyboardController.dismiss();
+export interface KeyboardService {
+  dismiss(): void;
+  show(): void;
+}
 
-const show = () => KeyboardController.setFocusTo('prev');
+@Injectable()
+export class KeyboardServiceImpl implements KeyboardService {
+  dismiss(): void {
+    KeyboardController.dismiss();
+  }
 
-export const KeyboardService = {
-  dismiss,
-  show,
-};
+  show(): void {
+    KeyboardController.setFocusTo('prev');
+  }
+}

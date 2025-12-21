@@ -1,25 +1,41 @@
-import { createMMKV } from 'react-native-mmkv';
+import { createMMKV, MMKV } from 'react-native-mmkv';
+import { Injectable } from '../lib';
 import { StorageKey } from './models';
 
-export const storage = createMMKV();
+export interface StorageService {
+  setItem(key: StorageKey, value: string | number | boolean): Promise<boolean>;
+  getItem(key: StorageKey): Promise<string | undefined>;
+  removeItem(key: StorageKey): Promise<void>;
+  removeAllItems(): void;
+}
 
-export const StorageService = {
-  setItem: (key: StorageKey, value: string | number | boolean) => {
-    storage.set(key, value);
+@Injectable()
+export class StorageServiceImpl implements StorageService {
+  private readonly storage: MMKV;
+
+  constructor() {
+    this.storage = createMMKV();
+  }
+
+  setItem(key: StorageKey, value: string | number | boolean): Promise<boolean> {
+    this.storage.set(key, value);
 
     return Promise.resolve(true);
-  },
-  getItem: (key: StorageKey) => {
-    const value = storage.getString(key);
+  }
+
+  getItem(key: StorageKey): Promise<string | undefined> {
+    const value = this.storage.getString(key);
 
     return Promise.resolve(value);
-  },
-  removeItem: (key: StorageKey) => {
-    storage.remove(key);
+  }
+
+  removeItem(key: StorageKey): Promise<void> {
+    this.storage.remove(key);
 
     return Promise.resolve();
-  },
-  removeAllItems: () => {
-    storage.clearAll();
-  },
-};
+  }
+
+  removeAllItems(): void {
+    this.storage.clearAll();
+  }
+}

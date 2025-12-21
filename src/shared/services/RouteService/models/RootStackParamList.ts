@@ -1,24 +1,43 @@
-import { RouteProp } from '@react-navigation/native';
+import { NavigatorScreenParams, RouteProp } from '@react-navigation/native';
 import { Routes } from './Routes';
 
 export type RouteType = keyof typeof Routes;
 
-export type RootStackParamList = {
-  [Routes.MAIN_NAVIGATOR]: undefined;
-
-  [Routes.AUTH_NAVIGATOR]: undefined;
-
-  [Routes.BOTTOM_TAB_BAR_NAVIGATOR]: undefined;
-
-  [Routes.ALERTS_NAVIGATOR]: undefined;
-
-  [Routes.PROFILE_NAVIGATOR]: undefined;
-
-  [Routes.AUTH]: undefined;
-
-  [Routes.PROFILE]: undefined;
-
-  [Routes.ALERTS]: undefined;
+type NavigatorWithTitle<T extends {}> = NavigatorScreenParams<T> & {
+  title?: string;
 };
 
-export type SignInProp = RouteProp<RootStackParamList, 'PROFILE'>;
+export type AlertsNavigatorParamList = {
+  [Routes.ALERTS]: { title?: string };
+};
+
+export type ProfileNavigatorParamList = {
+  [Routes.PROFILE]: { title?: string };
+};
+
+export type BottomTabBarNavigatorParamList = {
+  [Routes.ALERTS_NAVIGATOR]: NavigatorWithTitle<AlertsNavigatorParamList>;
+  [Routes.PROFILE_NAVIGATOR]: NavigatorWithTitle<ProfileNavigatorParamList>;
+};
+
+export type MainNavigatorParamList = {
+  [Routes.BOTTOM_TAB_BAR_NAVIGATOR]: NavigatorWithTitle<BottomTabBarNavigatorParamList>;
+};
+
+export type AuthNavigatorParamList = {
+  [Routes.AUTH]: { title?: string };
+};
+
+export type RootStackParamList = {
+  [Routes.MAIN_NAVIGATOR]: NavigatorWithTitle<MainNavigatorParamList>;
+  [Routes.AUTH_NAVIGATOR]: NavigatorWithTitle<AuthNavigatorParamList>;
+} & MainNavigatorParamList &
+  BottomTabBarNavigatorParamList &
+  AlertsNavigatorParamList &
+  ProfileNavigatorParamList &
+  AuthNavigatorParamList;
+
+export type ProfileScreenRouteProp = RouteProp<
+  RootStackParamList,
+  typeof Routes.PROFILE
+>;

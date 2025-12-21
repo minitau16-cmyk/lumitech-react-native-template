@@ -3,15 +3,15 @@ import {
   NavigationState,
   useNavigation,
 } from '@react-navigation/native';
-import { RootStackParamList } from 'services';
 
 export const useTypedNavigation = <
-  T extends keyof RootStackParamList = keyof RootStackParamList,
+  T extends
+    keyof ReactNavigation.RootParamList = keyof ReactNavigation.RootParamList,
 >(
   _: T,
 ) => {
   return useNavigation<
-    Omit<NavigationProp<RootStackParamList>, 'getState'> & {
+    Omit<NavigationProp<ReactNavigation.RootParamList>, 'getState'> & {
       getState(): NavigationState | undefined;
     }
   >();

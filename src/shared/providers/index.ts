@@ -1,2 +1,2 @@
-export * from './EventEmitterProvider';
 export * from './LanguageProvider';
+export * from './ServiceProvider';

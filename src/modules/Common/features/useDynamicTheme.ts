@@ -1,9 +1,11 @@
+import { useServices } from 'providers';
 import { UnistylesRuntime } from 'react-native-unistyles';
-import { RouteService } from 'services';
 import { useCurrentTheme, themeStoreActions } from 'stores';
 
 export const useDynamicTheme = () => {
   const theme = useCurrentTheme();
+
+  const { route } = useServices();
 
   const switchTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -14,7 +16,7 @@ export const useDynamicTheme = () => {
   };
 
   const onBackPress = () => {
-    RouteService.goBack();
+    route.goBack();
   };
 
   return {
