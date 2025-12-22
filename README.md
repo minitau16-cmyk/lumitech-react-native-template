@@ -61,7 +61,7 @@ Enable corepack and prepare Yarn 3 for your project:
 
 ### Built With
 
-- [react-native 0.79.0](https://reactnative.dev/blog/2025/04/08/react-native-0.79)
+- [react-native 0.81.5](https://reactnative.dev/blog/2025/08/12/react-native-0.81)
 
 - [typescript](https://www.typescriptlang.org/)
 
@@ -78,8 +78,6 @@ Enable corepack and prepare Yarn 3 for your project:
 - [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/)
 
 - [react-native-unistyles](https://reactnativeunistyles.vercel.app/)
-
-- [react-native-skia](https://shopify.github.io/react-native-skia/)
 
 - [react-native-modalfy](https://colorfy-software.gitbook.io/react-native-modalfy)
 
@@ -250,6 +248,207 @@ This architecture ensures:
 - **Reusability**: Common logic and UI components can be shared across modules
 - **Maintainability**: Strict layering prevents architectural violations
 - **Scalability**: New modules can be added without affecting existing code
+
+## 🔌 Dependency Injection System
+
+This template uses a custom **Dependency Injection (DI)** system for managing services throughout the application. The DI system provides centralized service management, automatic dependency resolution, and type-safe service access.
+
+### Architecture Overview
+
+The DI system is built on three core components:
+
+1. **Container**: Singleton service container that manages service instances and dependencies
+2. **Service Registration**: Automatic registration of all services at application startup
+3. **Service Access**: Two methods to access services - via React Context or direct container access
+
+### Container Implementation
+
+Located in `src/shared/services/lib.ts`, the Container class provides:
+
+- **Singleton Pattern**: Single shared instance across the application
+- **Automatic Dependency Resolution**: Uses `reflect-metadata` to resolve constructor dependencies
+- **Service Registration**: Lazy instantiation and caching of service instances
+
+```tsx
+import { Container, Injectable, registerServices } from 'services/lib';
+
+// Mark service as injectable
+@Injectable()
+export class MyServiceImpl implements MyService {
+  constructor(
+    private storage: StorageService,
+    private localization: LocalizationService,
+  ) {}
+
+  // Service methods...
+}
+```
+
+### Using Services in React Components
+
+**Method 1: useServices Hook (Recommended)**
+
+The `useServices` hook provides access to all services via React Context:
+
+```tsx
+import { useServices } from 'shared/providers/ServiceProvider';
+
+const MyComponent = () => {
+  const { toast, modal, storage, localization } = useServices();
+
+  const handleAction = async () => {
+    const value = await storage.get('key');
+    toast.show({ message: localization.t('success') });
+  };
+
+  return <Button onPress={handleAction} title="Action" />;
+};
+```
+
+**Method 2: getServices (Outside React)**
+
+For non-React code (utilities, business logic), use `getServices()`:
+
+```tsx
+import { getServices } from 'services';
+
+export const someUtility = async () => {
+  const { storage, exception } = getServices();
+
+  try {
+    const data = await storage.get('userData');
+    return data;
+  } catch (error) {
+    exception.handle(error);
+  }
+};
+```
+
+### Available Services
+
+The DI system provides the following pre-registered services:
+
+- **`keyboard`**: Keyboard interaction management (KeyboardService)
+- **`toast`**: Toast notification display (ToastService)
+- **`modal`**: Modal management and navigation (ModalService)
+- **`storage`**: Persistent key-value storage via MMKV (StorageService)
+- **`exception`**: Error handling and logging (ExceptionService)
+- **`localization`**: i18n translation service (LocalizationService)
+- **`route`**: Navigation and routing utilities (RouteService)
+- **`eventEmitter`**: Event-based communication (EventEmitterService)
+
+### Creating a New Service
+
+To create a new service and register it with the DI container:
+
+**1. Create the service interface and implementation:**
+
+```tsx
+// src/shared/services/MyService/index.ts
+export interface MyService {
+  doSomething(): void;
+  getData(): Promise<string>;
+}
+
+// src/shared/services/MyService/MyService.ts
+import { Injectable } from 'services/lib';
+import { MyService } from './index';
+
+@Injectable()
+export class MyServiceImpl implements MyService {
+  constructor(private storage: StorageService) {
+    // Dependencies are automatically injected
+  }
+
+  doSomething(): void {
+    // Implementation
+  }
+
+  async getData(): Promise<string> {
+    return this.storage.get('key');
+  }
+}
+```
+
+**2. Register the service in `src/shared/services/lib.ts`:**
+
+```tsx
+export const registerServices = (): void => {
+  if (isRegistered) {
+    return;
+  }
+
+  const container = Container.getInstance();
+
+  // ... existing services
+  const { MyServiceImpl } = require('./MyService');
+
+  container.register(MyServiceImpl);
+
+  isRegistered = true;
+};
+```
+
+**3. Add service to the services index (`src/shared/services/index.ts`):**
+
+```tsx
+import { MyServiceImpl } from './MyService';
+
+export const getServices = () => {
+  registerServices();
+  const container = Container.getInstance();
+
+  return {
+    // ... existing services
+    myService: container.resolve(MyServiceImpl),
+  };
+};
+```
+
+**4. Update ServiceProvider types (`src/shared/providers/ServiceProvider/ServiceProvider.tsx`):**
+
+```tsx
+import { MyService, MyServiceImpl } from 'services/MyService';
+
+export interface Services {
+  // ... existing services
+  myService: MyService;
+}
+
+export const ServiceProvider: React.FC<ServiceProviderProps> = ({
+  children,
+}) => {
+  const services = useMemo<Services>(() => {
+    registerServices();
+    const container = Container.getInstance();
+
+    return {
+      // ... existing services
+      myService: container.resolve(MyServiceImpl),
+    };
+  }, []);
+
+  // ...
+};
+```
+
+### Key Benefits
+
+- **Type Safety**: Full TypeScript support with interface-based service definitions
+- **Dependency Resolution**: Automatic constructor injection of service dependencies
+- **Single Responsibility**: Each service handles a specific domain concern
+- **Testability**: Services can be easily mocked for unit testing
+- **Centralized Management**: All services registered and managed in one place
+- **React Integration**: Seamless access via hooks and context
+
+### Best Practices
+
+1. **Interface-based Design**: Always define service interfaces separate from implementations
+2. **Constructor Injection**: Declare dependencies in constructor parameters
+3. **Use @Injectable Decorator**: Mark all service implementations with `@Injectable()`
+4. **Avoid Circular Dependencies**: Design services to prevent circular dependency chains
+5. **Single Instance**: Services are singletons - avoid storing component-specific state
+6. **Prefer useServices**: Use the hook in React components for better testing and React integration
 
 ## 📚 Recommended Library Usage
 
