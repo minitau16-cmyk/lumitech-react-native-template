@@ -15,9 +15,8 @@ import { ModalProvider } from 'react-native-modalfy';
 import { queryClient } from 'api';
 import { breakpoints, DarkTheme, LightTheme } from 'themes';
 import { RootNavigator } from 'navigation';
-import { EventEmitterProvider, LanguageProvider } from 'providers';
-import { themeStore$ } from 'stores';
-import { useDebug } from 'hooks';
+import { LanguageProvider, ServiceProvider } from 'providers';
+import { useCurrentTheme$ } from 'stores';
 import { modalStack } from './src/modules';
 
 StyleSheet.configure({
@@ -28,37 +27,37 @@ StyleSheet.configure({
   breakpoints,
   settings: {
     initialTheme: () => {
-      return themeStore$.currentTheme.get();
+      const currentTheme$ = useCurrentTheme$();
+
+      return currentTheme$.get();
     },
   },
 });
 
 export const App: React.FC = () => {
-  useDebug();
-
   return (
-    <LanguageProvider>
-      <ReducedMotionConfig mode={ReduceMotion.Never} />
-      <KeyboardProvider>
-        <GestureHandlerRootView style={styles.layout}>
-          <SafeAreaProvider>
-            <QueryClientProvider client={queryClient}>
-              <ModalProvider stack={modalStack}>
-                <TeleportProvider>
-                  <EventEmitterProvider>
+    <ServiceProvider>
+      <LanguageProvider>
+        <ReducedMotionConfig mode={ReduceMotion.Never} />
+        <KeyboardProvider>
+          <GestureHandlerRootView style={styles.layout}>
+            <SafeAreaProvider>
+              <QueryClientProvider client={queryClient}>
+                <ModalProvider stack={modalStack}>
+                  <TeleportProvider>
                     <View style={styles.overlay} pointerEvents="box-none">
                       <PortalHost name="overlay" />
                     </View>
                     <RootNavigator />
-                  </EventEmitterProvider>
-                </TeleportProvider>
-              </ModalProvider>
-            </QueryClientProvider>
-            <Toaster position="top-center" visibleToasts={1} />
-          </SafeAreaProvider>
-        </GestureHandlerRootView>
-      </KeyboardProvider>
-    </LanguageProvider>
+                  </TeleportProvider>
+                </ModalProvider>
+              </QueryClientProvider>
+              <Toaster position="top-center" visibleToasts={1} />
+            </SafeAreaProvider>
+          </GestureHandlerRootView>
+        </KeyboardProvider>
+      </LanguageProvider>
+    </ServiceProvider>
   );
 };
 

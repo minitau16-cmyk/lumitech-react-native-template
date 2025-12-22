@@ -1,76 +1,86 @@
 import { toast } from 'sonner-native';
 import { LightTheme } from 'themes';
 import { ViewStyle } from 'react-native';
+import { Injectable } from '../lib';
 
-interface ToastParams {
+export interface ToastParams {
   position?: 'top-center' | 'bottom-center';
   title: string;
   description?: string;
 }
 
-const style: ViewStyle = {
-  shadowOffset: {
-    height: 1,
-    width: 2,
-  },
-  shadowOpacity: 0.2,
-  elevation: 5,
-  borderRadius: 22,
-  shadowColor: LightTheme.colors.basic_100,
-};
+export interface ToastService {
+  onSuccess(params: ToastParams): void;
+  onDanger(params: ToastParams): void;
+  onWarning(params: ToastParams): void;
+  onHide(): void;
+}
 
-const duration = 3500;
+@Injectable()
+export class ToastServiceImpl implements ToastService {
+  private readonly style: ViewStyle;
 
-const onSuccess = ({ position, title, description }: ToastParams) => {
-  toast.success(title, {
-    position,
-    description,
-    style,
-    styles: {
-      title: {
-        fontFamily: LightTheme.fonts.Regular,
+  private readonly duration = 3500;
+
+  constructor() {
+    this.style = {
+      shadowOffset: {
+        height: 1,
+        width: 2,
       },
-    },
-    duration,
-    closeButton: true,
-  });
-};
+      shadowOpacity: 0.2,
+      elevation: 5,
+      borderRadius: 22,
+      shadowColor: LightTheme.colors.basic_100,
+    };
+  }
 
-const onDanger = ({ position, title, description }: ToastParams) => {
-  toast.error(title, {
-    position,
-    description,
-    style,
-    styles: {
-      title: {
-        fontFamily: LightTheme.fonts.Regular,
+  onSuccess({ position, title, description }: ToastParams): void {
+    toast.success(title, {
+      position,
+      description,
+      style: this.style,
+      styles: {
+        title: {
+          fontFamily: LightTheme.fonts.Regular,
+        },
       },
-    },
-    duration,
-    closeButton: true,
-  });
-};
+      duration: this.duration,
+      closeButton: true,
+    });
+  }
 
-const onWarning = ({ position, title, description }: ToastParams) => {
-  toast.warning(title, {
-    position,
-    description,
-    style,
-    styles: {
-      title: {
-        fontFamily: LightTheme.fonts.Regular,
+  onDanger({ position, title, description }: ToastParams): void {
+    toast.error(title, {
+      position,
+      description,
+      style: this.style,
+      styles: {
+        title: {
+          fontFamily: LightTheme.fonts.Regular,
+        },
       },
-    },
-    duration,
-    closeButton: true,
-  });
-};
+      duration: this.duration,
+      closeButton: true,
+    });
+  }
 
-const onHide = () => toast.dismiss();
+  onWarning({ position, title, description }: ToastParams): void {
+    toast.warning(title, {
+      position,
+      description,
+      style: this.style,
+      styles: {
+        title: {
+          fontFamily: LightTheme.fonts.Regular,
+        },
+      },
+      duration: this.duration,
+      closeButton: true,
+    });
+  }
 
-export const ToastService = {
-  onSuccess,
-  onDanger,
-  onHide,
-  onWarning,
-};
+  onHide(): void {
+    toast.dismiss();
+  }
+}

@@ -1,41 +1,48 @@
-import i18n from 'i18next';
+import i18n, { i18n as I18nInstance } from 'i18next';
 import { initReactI18next } from 'react-i18next';
-
 import en from 'translations/en.json';
+import { Injectable } from '../lib';
 
 export type Language = 'en';
 
-const resources = {
-  en: { translation: en },
-};
+export interface LocalizationService {
+  changeLanguage(newLanguage: Language): Promise<void>;
+  getCurrentLanguage(): Language;
+  getAvailableLanguages(): Language[];
+  readonly i18n: I18nInstance;
+}
 
-i18n.use(initReactI18next).init({
-  compatibilityJSON: 'v3',
-  resources,
-  fallbackLng: 'en',
-  lng: 'en',
-  interpolation: {
-    escapeValue: false,
-  },
-});
+@Injectable()
+export class LocalizationServiceImpl implements LocalizationService {
+  readonly i18n: I18nInstance;
 
-const changeLanguage = async (newLanguage: Language) => {
-  await i18n.changeLanguage(newLanguage);
-};
+  constructor() {
+    const resources = {
+      en: { translation: en },
+    };
 
-const getCurrentLanguage = (): Language => {
-  return i18n.language as Language;
-};
+    this.i18n = i18n.use(initReactI18next);
 
-const getAvailableLanguages = (): Language[] => {
-  return ['en'];
-};
+    this.i18n.init({
+      compatibilityJSON: 'v4',
+      resources,
+      fallbackLng: 'en',
+      lng: 'en',
+      interpolation: {
+        escapeValue: false,
+      },
+    });
+  }
 
-export const i18nLocale = i18n;
+  async changeLanguage(newLanguage: Language): Promise<void> {
+    await this.i18n.changeLanguage(newLanguage);
+  }
 
-export const LocalizationService = {
-  changeLanguage,
-  getCurrentLanguage,
-  getAvailableLanguages,
-  i18n,
-};
+  getCurrentLanguage(): Language {
+    return this.i18n.language as Language;
+  }
+
+  getAvailableLanguages(): Language[] {
+    return ['en'];
+  }
+}

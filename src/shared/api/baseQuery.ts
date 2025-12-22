@@ -1,6 +1,6 @@
 import Config from 'react-native-config';
-import { eventEmitter, ExceptionService, ToastService } from 'services';
-import { getAuthStoreInstance, resetAllStores } from 'stores';
+import { getServices } from 'services';
+import { resetAllStores } from 'stores';
 import axios from 'axios';
 import { Mutex } from 'async-mutex';
 import { createAxiosClient } from './http-client';
@@ -9,16 +9,20 @@ export const refreshMutex = new Mutex();
 
 export const axiosBaseQuery = axios.create({ baseURL: '' });
 
+const {
+  exception: exceptionService,
+  toast: toastService,
+  eventEmitter,
+} = getServices();
+
 export const baseQuery = createAxiosClient({
   baseURL: Config.API_URL || '',
   getToken: () => {
-    const { token } = getAuthStoreInstance();
-
-    return token.get();
+    return '';
   },
   onError: error => {
-    ToastService.onDanger({
-      title: ExceptionService.errorResolver(error),
+    toastService.onDanger({
+      title: exceptionService.errorResolver(error),
     });
   },
   onUnauthorized: async error => {
@@ -30,8 +34,8 @@ export const baseQuery = createAxiosClient({
       try {
         // your tokens request here
       } catch {
-        ToastService.onDanger({
-          title: ExceptionService.errorResolver(error),
+        toastService.onDanger({
+          title: exceptionService.errorResolver(error),
         });
 
         eventEmitter.emit('LOGOUT');

@@ -3,28 +3,36 @@ import { Text } from 'react-native';
 import { IconName } from '@react-native-vector-icons/icomoon';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Icon } from 'ui';
-import { RouteService, RouteType, Routes } from 'services';
 import { useTranslation } from 'react-i18next';
+import { useServices } from 'providers';
 import { Tab } from './lib';
 import { AlertsNavigator, ProfileNavigator } from './tabs';
 
-const tabIcons: Record<string, IconName> = {
-  [Routes.ALERTS_NAVIGATOR]: 'alerts',
-  [Routes.PROFILE_NAVIGATOR]: 'account',
+type BottomTabBarRoutes = Pick<
+  ReactNavigation.RootParamList,
+  'ALERTS_NAVIGATOR' | 'PROFILE_NAVIGATOR'
+>;
+
+type BottomTabBarKeys = keyof BottomTabBarRoutes;
+
+const tabIcons: Record<BottomTabBarKeys, IconName> = {
+  ALERTS_NAVIGATOR: 'alerts',
+  PROFILE_NAVIGATOR: 'account',
 };
 
 export const BottomTabBarNavigator: React.FC = () => {
   const { theme } = useUnistyles();
+  const { route } = useServices();
 
   const { t } = useTranslation();
 
-  const titles: Record<string, string> = {
-    [Routes.ALERTS_NAVIGATOR]: t('screens.alerts'),
-    [Routes.PROFILE_NAVIGATOR]: t('screens.account'),
+  const titles: Record<BottomTabBarKeys, string> = {
+    ALERTS_NAVIGATOR: t('screens.alerts'),
+    PROFILE_NAVIGATOR: t('screens.account'),
   };
 
-  const handleLongPress = (routeName: RouteType) => {
-    RouteService.navigate(routeName);
+  const handleLongPress = (routeName: keyof ReactNavigation.RootParamList) => {
+    route.navigate(routeName);
   };
 
   return (
@@ -37,13 +45,19 @@ export const BottomTabBarNavigator: React.FC = () => {
         tabBarItemStyle: styles.tabBarItemStyle,
         lazy: true,
         tabBarLabel: () => (
-          <Text style={styles.text}>{titles[route.name]}</Text>
+          <Text style={styles.text}>
+            {titles[route.name as BottomTabBarKeys]}
+          </Text>
         ),
         tabBarIcon: ({ focused }) => {
           const iconColor = focused ? 'basic_400' : 'basic_300';
 
           return (
-            <Icon name={tabIcons[route.name]} size={22} color={iconColor} />
+            <Icon
+              name={tabIcons[route.name as BottomTabBarKeys]}
+              size={22}
+              color={iconColor}
+            />
           );
         },
       })}

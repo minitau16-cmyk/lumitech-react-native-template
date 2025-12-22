@@ -1,8 +1,6 @@
-import { syncObservable } from '@legendapp/state/sync';
 import { observable, syncState } from '@legendapp/state';
-import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { ThemeStore } from './types';
-import { PersistStorageKeys } from '../models';
+import { persistObservable } from '../lib';
 
 const initialState: ThemeStore = {
   currentTheme: 'light',
@@ -10,12 +8,7 @@ const initialState: ThemeStore = {
 
 export const themeStore$ = observable<ThemeStore>(initialState);
 
-syncObservable(themeStore$, {
-  persist: {
-    name: PersistStorageKeys.THEME,
-    plugin: ObservablePersistMMKV,
-  },
-});
+persistObservable(themeStore$, 'THEME_STORAGE');
 
 const themeStoreSyncState$ = syncState(themeStore$);
 

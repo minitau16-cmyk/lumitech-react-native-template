@@ -7,3 +7,4 @@ export * from './useCombinedRef';
 export * from './useDebounce';
 export * from './useDebug';
 export * from './useTypedRoute';
+export * from './useTypedNavigation';

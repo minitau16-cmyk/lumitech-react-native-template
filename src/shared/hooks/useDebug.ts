@@ -1,15 +1,15 @@
-import { useMMKVDevTools } from '@rozenite/mmkv-plugin';
 import { useNetworkActivityDevTools } from '@rozenite/network-activity-plugin';
 import { useTanStackQueryDevTools } from '@rozenite/tanstack-query-plugin';
 import { queryClient } from 'api';
-import { storage } from 'services';
+import { useServices } from 'providers';
+import { useReactNavigationDevTools } from '@rozenite/react-navigation-plugin';
 
 export const useDebug = () => {
+  const { route } = useServices();
+
   useTanStackQueryDevTools(queryClient);
 
   useNetworkActivityDevTools();
 
-  useMMKVDevTools({
-    storages: [storage],
-  });
+  useReactNavigationDevTools({ ref: route.navigationRef });
 };

@@ -1,49 +1,43 @@
 import { useObserve } from '@legendapp/state/react';
-import { KeyboardService } from 'services';
-import { LoginInSchema } from './config';
-import { useAuthFormStore } from './auth-observable';
+import { useServices } from 'providers';
 import { useSignIn } from './useSignIn';
+import {
+  authFormActions,
+  useDidSubmit$,
+  useEmailField$,
+  usePasswordField$,
+  useIsSecureModeEnabled$,
+  useEmailError$,
+  usePasswordError$,
+  useIsEmailError$,
+  useIsPasswordError$,
+} from '../stores';
 
 export const useAuth = () => {
-  const authFormStore$ = useAuthFormStore();
+  const didSubmit$ = useDidSubmit$();
+
+  const { keyboard: keyboardService } = useServices();
 
   const { onSignIn, isLoading$ } = useSignIn();
 
   useObserve(() => {
-    if (!authFormStore$.didSubmit.get()) {
+    if (!didSubmit$.get()) {
       return;
     }
 
-    const result = LoginInSchema.safeParse(authFormStore$.formFields.get());
-
-    if (result.success) {
-      authFormStore$.errors.set({ email: '', password: '' });
-
-      return;
-    }
-
-    const { fieldErrors } = result.error.flatten();
-
-    authFormStore$.errors.set({
-      email: fieldErrors.email?.[0] ?? '',
-      password: fieldErrors.password?.[0] ?? '',
-    });
+    authFormActions.validateForm();
   });
 
   const onSubmit = () => {
-    KeyboardService.dismiss();
+    keyboardService.dismiss();
 
-    authFormStore$.didSubmit.set(true);
+    authFormActions.markAsSubmitted();
 
-    const formData = authFormStore$.formFields.get();
-
-    const result = LoginInSchema.safeParse(formData);
-
-    if (!result.success) {
+    if (!authFormActions.validateForm()) {
       return;
     }
 
-    const { email, password } = formData;
+    const { email, password } = authFormActions.getFormValues();
 
     onSignIn({ email, password });
   };
@@ -51,6 +45,13 @@ export const useAuth = () => {
   return {
     onSubmit,
     isLoading$,
-    authFormStore$,
+    authFormActions,
+    emailField$: useEmailField$(),
+    passwordField$: usePasswordField$(),
+    isSecureModeEnabled$: useIsSecureModeEnabled$(),
+    emailError$: useEmailError$(),
+    passwordError$: usePasswordError$(),
+    isEmailError$: useIsEmailError$(),
+    isPasswordError$: useIsPasswordError$(),
   };
 };

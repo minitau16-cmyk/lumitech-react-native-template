@@ -1,20 +1,26 @@
 import { modalfy } from 'react-native-modalfy';
+import { Injectable } from '../lib';
 import { ModalNames, ModalStackParams } from './models';
 
-const open = <T extends ModalNames>(name: T, params?: ModalStackParams[T]) => {
-  modalfy().openModal(name, params);
-};
+export interface ModalService {
+  open<T extends ModalNames>(name: T, params?: ModalStackParams[T]): void;
+  close<T extends ModalNames>(name: T, callback?: () => void): void;
+  closeAllModals(): void;
+}
 
-const close = <T extends ModalNames>(name: T, callback?: () => void) => {
-  modalfy().closeModal(name, callback);
-};
+@Injectable()
+export class ModalServiceImpl implements ModalService {
+  private readonly modal = modalfy();
 
-const closeAllModals = () => {
-  modalfy().closeAllModals();
-};
+  open<T extends ModalNames>(name: T, params?: ModalStackParams[T]): void {
+    this.modal.openModal(name, params);
+  }
 
-export const ModalService = {
-  open,
-  close,
-  closeAllModals,
-};
+  close<T extends ModalNames>(name: T, callback?: () => void): void {
+    this.modal.closeModal(name, callback);
+  }
+
+  closeAllModals(): void {
+    this.modal.closeAllModals();
+  }
+}

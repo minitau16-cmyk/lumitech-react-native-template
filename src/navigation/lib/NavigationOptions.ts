@@ -2,11 +2,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { DefaultTheme, Theme } from '@react-navigation/native';
 import { LightColors } from 'themes';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { RootStackParamList } from 'services';
 
-export const Stack = createNativeStackNavigator<RootStackParamList>();
+export const Stack =
+  createNativeStackNavigator<ReactNavigation.RootParamList>();
 
-export const Tab = createBottomTabNavigator<RootStackParamList>();
+export const Tab = createBottomTabNavigator<ReactNavigation.RootParamList>();
 
 export const navigationTheme: Theme = {
   dark: false,

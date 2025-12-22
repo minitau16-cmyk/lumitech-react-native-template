@@ -8,6 +8,9 @@ module.exports = {
     'airbnb',
     'plugin:prettier/recommended',
   ],
+  globals: {
+    ReactNavigation: 'readonly',
+  },
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
@@ -306,6 +309,16 @@ module.exports = {
       files: ['**/modules/*/@*/index.ts'],
       rules: {
         'no-restricted-imports': 'off',
+      },
+    },
+    {
+      files: [
+        '**/services/KeyboardService/KeyboardService.ts',
+        '**/services/LocalizationService/LocalizationService.ts',
+        '**/services/ToastService/ToastService.ts',
+      ],
+      rules: {
+        'class-methods-use-this': 'off',
       },
     },
   ],
