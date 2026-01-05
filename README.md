@@ -3,7 +3,7 @@
 
 </div>
 
-# [Lumitech](https://lumitech.co/) React Native Template 🌌
+# Lumitech React Native Template 🌌
 
 Welcome to the **Lumitech React Native Template (v0.81.5)**! This template is designed to give you a head start on your project by streamlining the setup process and enabling you to focus on building your app faster. 🌟
 
